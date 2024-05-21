@@ -5,6 +5,6 @@ class Register extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Register");
+    return const Text("Register");
   }
 }

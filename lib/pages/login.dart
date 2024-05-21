@@ -5,6 +5,6 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text("Login");
+    return const Text("Login");
   }
 }

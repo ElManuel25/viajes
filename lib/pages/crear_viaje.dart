@@ -11,11 +11,13 @@ class _CrearViajeState extends State<CrearViaje> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _presupuestoController = TextEditingController();
+  final _fechaController = TextEditingController();
 
   @override
   void dispose() {
     _nombreController.dispose();
     _presupuestoController.dispose();
+    _fechaController.dispose();
     super.dispose();
   }
 
@@ -23,13 +25,27 @@ class _CrearViajeState extends State<CrearViaje> {
     if (_formKey.currentState!.validate()) {
       String nombre = _nombreController.text;
       String presupuesto = _presupuestoController.text;
-      // Aquí puedes manejar el viaje agregado, como guardarlo en una lista o enviarlo a un servidor.
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content:
-            Text('Viaje agregado: $nombre con presupuesto \$${presupuesto}'),
-      ));
-      _nombreController.clear();
-      _presupuestoController.clear();
+      String fecha = _fechaController.text;
+      // Regresar los datos del viaje a HomePage.
+      Navigator.pop(context, {
+        'nombre': nombre,
+        'presupuesto': presupuesto,
+        'fecha': fecha,
+      });
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        _fechaController.text = "${picked.toLocal()}".split(' ')[0];
+      });
     }
   }
 
@@ -74,6 +90,24 @@ class _CrearViajeState extends State<CrearViaje> {
                       }
                       if (double.tryParse(value) == null) {
                         return 'Por favor ingrese un número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: _fechaController,
+                    decoration: InputDecoration(
+                      labelText: 'Fecha del Viaje',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.calendar_today),
+                        onPressed: () => _selectDate(context),
+                      ),
+                    ),
+                    readOnly: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor seleccione la fecha del viaje';
                       }
                       return null;
                     },
