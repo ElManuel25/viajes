@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:viajes/pages/crear_viaje.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
 
   runApp(const MainApp());
 }
@@ -14,15 +15,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      routes: {
-        '/': (context) =>  Login(), 
-        '/register': (context) => Register(),
-        '/crear_viaje': (context) => CrearViaje(),
-
-      },
-      initialRoute: '/',
-    );  
-    
+      home: CrearViaje(),
+    );
   }
 }
-
