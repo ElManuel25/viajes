@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:viajes/pages/crear_viaje.dart';
+import 'package:viajes/pages/home.dart';
+import 'package:viajes/pages/login.dart';
+import 'package:viajes/pages/register.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +23,10 @@ class MainApp extends StatelessWidget {
         '/': (context) =>  Login(), 
         '/register': (context) => Register(),
         '/crear_viaje': (context) => CrearViaje(),
+        '/home': (context) => HomePage(),
 
       },
-      initialRoute: '/',
+      initialRoute: '/home',
     );  
     
   }
