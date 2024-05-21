@@ -1,123 +1,129 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Importar la clase DateFormat
 
 class CrearViaje extends StatefulWidget {
-  const CrearViaje({super.key});
+  const CrearViaje({Key? key}) : super(key: key);
 
   @override
   _CrearViajeState createState() => _CrearViajeState();
 }
 
 class _CrearViajeState extends State<CrearViaje> {
-  final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _presupuestoController = TextEditingController();
-  final _fechaController = TextEditingController();
+  DateTime? _selectedDate;
 
   @override
   void dispose() {
     _nombreController.dispose();
     _presupuestoController.dispose();
-    _fechaController.dispose();
     super.dispose();
   }
 
-  void _agregarViaje() {
-    if (_formKey.currentState!.validate()) {
-      String nombre = _nombreController.text;
-      String presupuesto = _presupuestoController.text;
-      String fecha = _fechaController.text;
-      // Regresar los datos del viaje a HomePage.
+  void _crearViaje() {
+    if (_nombreController.text.isNotEmpty &&
+        _presupuestoController.text.isNotEmpty &&
+        _selectedDate != null) {
       Navigator.pop(context, {
-        'nombre': nombre,
-        'presupuesto': presupuesto,
-        'fecha': fecha,
+        'nombre': _nombreController.text,
+        'presupuesto': _presupuestoController.text,
+        'fecha':
+            DateFormat('yyyy-MM-dd').format(_selectedDate!), // Corregir aquí
       });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor ingresa todos los detalles del viaje'),
+        ),
+      );
     }
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    DateTime? picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
-    if (picked != null) {
+    if (picked != null && picked != _selectedDate)
       setState(() {
-        _fechaController.text = "${picked.toLocal()}".split(' ')[0];
+        _selectedDate = picked;
       });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Crear Viajes')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: Text('Crear Viaje'),
+        backgroundColor: Colors.teal,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              child: Text(
-                'Crear Viajes',
-                style: TextStyle(fontSize: 24),
+            Text(
+              'Nombre del Viaje',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _nombreController,
+              decoration: InputDecoration(
+                hintText: 'Ej: Vacaciones en la Playa',
+                border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 20),
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _nombreController,
-                    decoration: InputDecoration(labelText: 'Nombre del Viaje'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese el nombre del viaje';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _presupuestoController,
-                    decoration:
-                        InputDecoration(labelText: 'Presupuesto del Viaje'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingrese el presupuesto del viaje';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Por favor ingrese un número válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  TextFormField(
-                    controller: _fechaController,
-                    decoration: InputDecoration(
-                      labelText: 'Fecha del Viaje',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.calendar_today),
+            Text(
+              'Presupuesto del Viaje',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            TextField(
+              controller: _presupuestoController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Ej: 1000',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Text(
+                  'Fecha del Viaje: ',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(width: 10),
+                _selectedDate != null
+                    ? Text(
+                        DateFormat('dd/MM/yyyy')
+                            .format(_selectedDate!), // Corregir aquí
+                        style: TextStyle(fontSize: 18),
+                      )
+                    : TextButton(
                         onPressed: () => _selectDate(context),
+                        child: Text(
+                          'Seleccionar Fecha',
+                          style: TextStyle(fontSize: 18, color: Colors.blue),
+                        ),
                       ),
-                    ),
-                    readOnly: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor seleccione la fecha del viaje';
-                      }
-                      return null;
-                    },
+              ],
+            ),
+            SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                onPressed: _crearViaje,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  child: Text(
+                    'Crear Viaje',
+                    style: TextStyle(fontSize: 20),
                   ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _agregarViaje,
-                    child: Text('Agregar Viaje'),
-                  ),
-                ],
+                ),
               ),
             ),
           ],
